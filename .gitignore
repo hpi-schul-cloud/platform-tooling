@@ -1,0 +1,31 @@
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs and editors
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.project
+.classpath
+.settings/
+
+# Python
+__pycache__/
+*.pyc
+
+# Logs
+logs
+*.log
+
+# Local env
+.env
+.env.*
+
+# Build and temp
+tmp/
+.tmp/
+

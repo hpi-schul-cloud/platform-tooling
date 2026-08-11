@@ -1,0 +1,29 @@
+FROM docker.io/debian:stable-slim
+
+ARG UID=65532
+ARG GID=65532
+
+RUN apt-get update \
+    && apt-get install --yes --no-install-recommends \
+        ca-certificates \
+        curl \
+        dnsutils \
+        iproute2 \
+        iputils-ping \
+        jq \
+        netcat-openbsd \
+        rclone \
+        traceroute \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --gid "${GID}" nonroot \
+    && useradd --uid "${UID}" --gid "${GID}" --create-home --shell /bin/sh nonroot \
+    && mkdir -p /work /tmp \
+    && chown nonroot:nonroot /work /tmp \
+    && chmod 1777 /tmp
+
+WORKDIR /work
+
+USER nonroot:nonroot
+
+CMD ["sh"]
+
