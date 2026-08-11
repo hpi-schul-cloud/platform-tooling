@@ -1,0 +1,14 @@
+# Keep text files normalized with LF line endings.
+* text=auto eol=lf
+
+# Common binary assets.
+*.gif binary
+*.ico binary
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.tar binary
+*.tgz binary
+*.gz binary
+*.zip binary
+

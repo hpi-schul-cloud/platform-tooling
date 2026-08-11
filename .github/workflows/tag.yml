@@ -1,0 +1,109 @@
+---
+name: Build and push images on tag
+
+on:
+  push:
+    tags:
+      - '[0-9]*'
+
+permissions:
+  contents: read
+
+jobs:
+  build_and_push_job_tools:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Docker meta job-tools
+        id: docker_meta_job_tools
+        uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6.0.0
+        with:
+          images: ghcr.io/${{ github.repository }}/job-tools, quay.io/schulcloudverbund/platform-tooling-job-tools
+          tags: |
+            type=ref,event=tag
+          labels: |
+            org.opencontainers.image.title=platform-tooling job-tools
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login to Quay
+        uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
+
+      - name: Build and push job-tools
+        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
+        env:
+          DOCKER_BUILD_RECORD_UPLOAD: false
+        with:
+          context: ./job-tools
+          file: ./job-tools/Containerfile
+          platforms: linux/amd64
+          push: true
+          pull: true
+          tags: ${{ steps.docker_meta_job_tools.outputs.tags }}
+          labels: ${{ steps.docker_meta_job_tools.outputs.labels }}
+
+  build_and_push_admin_tools:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Docker meta admin-tools
+        id: docker_meta_admin_tools
+        uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6.0.0
+        with:
+          images: ghcr.io/${{ github.repository }}/admin-tools, quay.io/schulcloudverbund/platform-tooling-admin-tools
+          tags: |
+            type=ref,event=tag
+          labels: |
+            org.opencontainers.image.title=platform-tooling admin-tools
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login to Quay
+        uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
+
+      - name: Build and push admin-tools
+        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
+        env:
+          DOCKER_BUILD_RECORD_UPLOAD: false
+        with:
+          context: ./admin-tools
+          file: ./admin-tools/Containerfile
+          platforms: linux/amd64
+          push: true
+          pull: true
+          tags: ${{ steps.docker_meta_admin_tools.outputs.tags }}
+          labels: ${{ steps.docker_meta_admin_tools.outputs.labels }}
